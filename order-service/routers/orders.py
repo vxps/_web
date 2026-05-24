@@ -4,6 +4,7 @@ from typing import Optional, List
 import uuid
 
 from database.session import get_db
+from auth.jwt import get_current_user
 from schemas.order import OrderCreate, OrderUpdate, OrderResponse, OrderListResponse
 from crud import order as order_crud
 
@@ -56,7 +57,8 @@ async def get_order(
 async def update_order_status(
         order_id: str,
         status_update: OrderUpdate,
-        db: AsyncSession = Depends(get_db)
+        db: AsyncSession = Depends(get_db),
+_=Depends(get_current_user)
 ):
     try:
         order_uuid = uuid.UUID(order_id)

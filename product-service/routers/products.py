@@ -5,6 +5,7 @@ from decimal import Decimal
 import uuid
 
 from database.session import get_db
+from auth.jwt import get_current_user
 from schemas.product import ProductCreate, ProductUpdate, ProductResponse, ProductListResponse
 from crud import product as product_crud
 
@@ -64,7 +65,8 @@ async def get_product(
 @router.post("", response_model=ProductResponse, status_code=201)
 async def create_product(
         product: ProductCreate,
-        db: AsyncSession = Depends(get_db)
+        db: AsyncSession = Depends(get_db),
+        _=Depends(get_current_user)
 ):
     if await product_crud.check_sku_exists(db, product.sku):
         raise HTTPException(status_code=400, detail="SKU already exists")
@@ -77,7 +79,8 @@ async def create_product(
 async def update_product(
         product_id: uuid.UUID,
         product_update: ProductUpdate,
-        db: AsyncSession = Depends(get_db)
+        db: AsyncSession = Depends(get_db),
+_=Depends(get_current_user)
 ):
     if product_update.sku:
         if await product_crud.check_sku_exists(db, product_update.sku, exclude_id=product_id):
@@ -92,7 +95,8 @@ async def update_product(
 @router.delete("/{product_id}", status_code=204)
 async def delete_product(
         product_id: uuid.UUID,
-        db: AsyncSession = Depends(get_db)
+        db: AsyncSession = Depends(get_db),
+_=Depends(get_current_user)
 ):
     success = await product_crud.delete_product(db, product_id)
     if not success:

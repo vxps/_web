@@ -1,6 +1,8 @@
 ﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from auth.routes import router as auth_router
+
 
 from database.session import engine
 from database.init_db import init_db
@@ -18,6 +20,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
